@@ -1,17 +1,34 @@
--- Mobile Tap to Teleport Script (Delta Executor)
-
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 local player = Players.LocalPlayer
 local camera = workspace.CurrentCamera
 
-print("Tap to teleport enabled (Mobile)")
+local screenGui = Instance.new("ScreenGui", game.CoreGui)
+screenGui.Name = "TapToTPGui"
+
+local toggleButton = Instance.new("TextButton", screenGui)
+toggleButton.Size = UDim2.new(0, 140, 0, 50)
+toggleButton.Position = UDim2.new(0.5, -70, 0.9, -25)
+toggleButton.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+toggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+toggleButton.Text = "Disable TP"
+toggleButton.TextSize = 18
+toggleButton.Font = Enum.Font.GothamBold
+toggleButton.BorderSizePixel = 0
+
+local teleportEnabled = true
+
+toggleButton.MouseButton1Click:Connect(function()
+    teleportEnabled = not teleportEnabled
+    toggleButton.Text = teleportEnabled and "Disable TP" or "Enable TP"
+end)
 
 UserInputService.TouchTap:Connect(function(touchPositions, _)
-    local screenPos = touchPositions[1] -- Get the first touch point
+    if not teleportEnabled then return end
+
+    local screenPos = touchPositions[1]
     local unitRay = camera:ScreenPointToRay(screenPos.X, screenPos.Y)
 
-    -- Raycast to get the position on the map
     local rayParams = RaycastParams.new()
     rayParams.FilterDescendantsInstances = {player.Character}
     rayParams.FilterType = Enum.RaycastFilterType.Blacklist
