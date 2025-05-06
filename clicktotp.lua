@@ -7,20 +7,24 @@ local screenGui = Instance.new("ScreenGui", game.CoreGui)
 screenGui.Name = "TapToTPGui"
 
 local toggleButton = Instance.new("TextButton", screenGui)
-toggleButton.Size = UDim2.new(0, 140, 0, 50)
-toggleButton.Position = UDim2.new(0.5, -70, 0.9, -25)
+toggleButton.Size = UDim2.new(0, 50, 0, 50)
+toggleButton.Position = UDim2.new(0.5, -25, 0.9, -25)
 toggleButton.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 toggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-toggleButton.Text = "Disable TP"
-toggleButton.TextSize = 18
+toggleButton.Text = "✓"
+toggleButton.TextSize = 30
 toggleButton.Font = Enum.Font.GothamBold
 toggleButton.BorderSizePixel = 0
+
+local corner = Instance.new("UICorner")
+corner.CornerRadius = UDim.new(0, 15)
+corner.Parent = toggleButton
 
 local teleportEnabled = true
 
 toggleButton.MouseButton1Click:Connect(function()
     teleportEnabled = not teleportEnabled
-    toggleButton.Text = teleportEnabled and "Disable TP" or "Enable TP"
+    toggleButton.Text = teleportEnabled and "✓" or "✗"
 end)
 
 UserInputService.TouchTap:Connect(function(touchPositions, _)
