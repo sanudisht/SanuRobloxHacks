@@ -9,7 +9,6 @@ screenGui.ResetOnSpawn = false
 screenGui.IgnoreGuiInset = true
 screenGui.Parent = lp:WaitForChild("PlayerGui")
 
--- Splash screen
 local splashFrame = Instance.new("Frame")
 splashFrame.Size = UDim2.new(0.4, 0, 0.1, 0)
 splashFrame.Position = UDim2.new(0.3, 0, 0.45, 0)
@@ -29,16 +28,17 @@ splashText.Text = "Morph GUI Beta V1"
 splashText.TextColor3 = Color3.fromRGB(255, 255, 255)
 splashText.Font = Enum.Font.GothamBold
 splashText.TextScaled = true
+splashText.TextTransparency = 1
 splashText.Parent = splashFrame
 
 TweenService:Create(splashFrame, TweenInfo.new(0.5), {BackgroundTransparency = 0}):Play()
+TweenService:Create(splashText, TweenInfo.new(0.5), {TextTransparency = 0}):Play()
 task.wait(2)
 TweenService:Create(splashFrame, TweenInfo.new(0.5), {BackgroundTransparency = 1}):Play()
 TweenService:Create(splashText, TweenInfo.new(0.5), {TextTransparency = 1}):Play()
 task.wait(0.6)
 splashFrame:Destroy()
 
--- Main GUI
 local frame = Instance.new("Frame")
 frame.Size = UDim2.new(0.6, 0, 0, 100)
 frame.Position = UDim2.new(0.2, 0, 0.4, 0)
@@ -80,19 +80,17 @@ local boxCorner = Instance.new("UICorner")
 boxCorner.CornerRadius = UDim.new(0, 8)
 boxCorner.Parent = textBox
 
--- Error label
 local errorLabel = Instance.new("TextLabel")
-errorLabel.Size = UDim2.new(0.65, 0, 0, 16)
-errorLabel.Position = UDim2.new(0.025, 0, 1, -2)
+errorLabel.Size = UDim2.new(0.65, 0, 0, 14)
+errorLabel.Position = UDim2.new(0.025, 0, 1, 2)
 errorLabel.BackgroundTransparency = 1
-errorLabel.TextColor3 = Color3.fromRGB(255, 50, 50)
+errorLabel.TextColor3 = Color3.fromRGB(255, 0, 0)
 errorLabel.Text = ""
 errorLabel.TextSize = 12
 errorLabel.Font = Enum.Font.Gotham
 errorLabel.TextXAlignment = Enum.TextXAlignment.Left
 errorLabel.Parent = textBox
 
--- Confirm Button
 local confirmBtn = Instance.new("TextButton")
 confirmBtn.Size = UDim2.new(0.275, 0, 0, 36)
 confirmBtn.Position = UDim2.new(0.7, 0, 0.5, -18)
@@ -108,7 +106,6 @@ local btnCorner = Instance.new("UICorner")
 btnCorner.CornerRadius = UDim.new(0, 8)
 btnCorner.Parent = confirmBtn
 
--- Dragging logic
 local dragging, dragInput, dragStart, startPos
 frame.InputBegan:Connect(function(input)
 	if input.UserInputType == Enum.UserInputType.MouseButton1 then
@@ -129,32 +126,23 @@ UserInputService.InputChanged:Connect(function(input)
 	end
 end)
 
--- Morph function
 local function morphToUsername(username)
 	local success, userId = pcall(function()
 		return Players:GetUserIdFromNameAsync(username)
 	end)
-	if not success then
-		return false
-	end
-
+	if not success then return false end
 	local clone = Players:CreateHumanoidModelFromUserId(userId)
 	if not clone then return false end
-
 	local root = clone:FindFirstChild("HumanoidRootPart") or clone.PrimaryPart
 	local curRoot = lp.Character and lp.Character:FindFirstChild("HumanoidRootPart")
-
 	if curRoot and root then
 		clone:PivotTo(curRoot.CFrame)
 	end
-
 	if lp.Character then
 		lp.Character:Destroy()
 	end
-
 	clone.Parent = workspace
 	lp.Character = clone
-
 	task.wait(0.1)
 	local cam = workspace.CurrentCamera
 	local hum = clone:FindFirstChildOfClass("Humanoid")
@@ -162,20 +150,19 @@ local function morphToUsername(username)
 		cam.CameraSubject = hum
 		cam.CameraType = Enum.CameraType.Custom
 	end
-
 	return true
 end
 
--- Button logic
 confirmBtn.MouseButton1Click:Connect(function()
 	local user = textBox.Text:match("^%s*(.-)%s*$")
 	errorLabel.Text = ""
 
-	-- Button click animation
-	local clickTween = TweenService:Create(confirmBtn, TweenInfo.new(0.1), {Size = confirmBtn.Size + UDim2.new(0.02, 0, 0.02, 0)})
-	clickTween:Play()
-	clickTween.Completed:Wait()
-	TweenService:Create(confirmBtn, TweenInfo.new(0.1), {Size = UDim2.new(0.275, 0, 0, 36)}):Play()
+	local originalSize = confirmBtn.Size
+	local shrinkTween = TweenService:Create(confirmBtn, TweenInfo.new(0.05), {Size = originalSize - UDim2.new(0.02, 0, 0.02, 0)})
+	local growTween = TweenService:Create(confirmBtn, TweenInfo.new(0.1), {Size = originalSize})
+	shrinkTween:Play()
+	shrinkTween.Completed:Wait()
+	growTween:Play()
 
 	if user ~= "" then
 		local success = morphToUsername(user)
