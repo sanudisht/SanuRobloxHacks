@@ -163,6 +163,14 @@ local function morphToUsername(username)
 
 	clonedChar.Parent = workspace
 	lp.Character = clonedChar
+
+	task.wait(0.1)
+	local cam = workspace.CurrentCamera
+	local humanoid = clonedChar:FindFirstChildOfClass("Humanoid")
+	if humanoid then
+		cam.CameraSubject = humanoid
+		cam.CameraType = Enum.CameraType.Custom
+	end
 end
 
 local function closeGui()
