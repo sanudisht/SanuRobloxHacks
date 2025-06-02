@@ -1,110 +1,69 @@
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local lp = Players.LocalPlayer
 
-local RemoteFolder = ReplicatedStorage:FindFirstChild("AvatarRemotes")
-if not RemoteFolder then
-    RemoteFolder = Instance.new("Folder")
-    RemoteFolder.Name = "AvatarRemotes"
-    RemoteFolder.Parent = ReplicatedStorage
-end
-
-local RemoteEvents = {
-    ChangeAvatar = "RemoteEvent",
-    RequestUserId = "RemoteFunction"
-}
-
-for name, typeStr in pairs(RemoteEvents) do
-    if not RemoteFolder:FindFirstChild(name) then
-        local remote
-        if typeStr == "RemoteEvent" then
-            remote = Instance.new("RemoteEvent")
-        elseif typeStr == "RemoteFunction" then
-            remote = Instance.new("RemoteFunction")
-        end
-        remote.Name = name
-        remote.Parent = RemoteFolder
-    end
-end
-
 local screenGui = Instance.new("ScreenGui")
-screenGui.Name = "UsernamePromptGui"
+screenGui.Name = "AvatarGUI"
 screenGui.ResetOnSpawn = false
+screenGui.IgnoreGuiInset = true
 screenGui.Parent = lp:WaitForChild("PlayerGui")
 
 local frame = Instance.new("Frame")
-frame.Size = UDim2.new(0.8, 0, 0, 140)
-frame.Position = UDim2.new(0.1, 0, 0.4, 0)
-frame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-frame.BackgroundTransparency = 1
+frame.Size = UDim2.new(0.6, 0, 0, 100)
+frame.Position = UDim2.new(0.2, 0, 0.4, 0)
+frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+frame.BackgroundTransparency = 0
+frame.BorderSizePixel = 0
 frame.Parent = screenGui
 frame.ClipsDescendants = true
 
 local uicorner = Instance.new("UICorner")
-uicorner.CornerRadius = UDim.new(0, 18)
+uicorner.CornerRadius = UDim.new(0, 12)
 uicorner.Parent = frame
 
 local title = Instance.new("TextLabel")
-title.Size = UDim2.new(1, -20, 0, 30)
-title.Position = UDim2.new(0, 10, 0, 10)
+title.Size = UDim2.new(1, 0, 0, 28)
+title.Position = UDim2.new(0, 0, 0, 0)
 title.BackgroundTransparency = 1
 title.Text = "Enter Username"
-title.TextColor3 = Color3.fromRGB(230, 230, 230)
+title.TextColor3 = Color3.fromRGB(255, 255, 255)
 title.Font = Enum.Font.GothamBold
-title.TextSize = 22
-title.TextXAlignment = Enum.TextXAlignment.Center
+title.TextSize = 20
 title.Parent = frame
 
 local textBox = Instance.new("TextBox")
-textBox.Size = UDim2.new(1, -40, 0, 40)
-textBox.Position = UDim2.new(0, 20, 0, 50)
-textBox.BackgroundColor3 = Color3.fromRGB(55, 55, 55)
-textBox.TextColor3 = Color3.fromRGB(240, 240, 240)
-textBox.Font = Enum.Font.Gotham
-textBox.PlaceholderText = "Target Username"
+textBox.Size = UDim2.new(0.65, 0, 0, 36)
+textBox.Position = UDim2.new(0.025, 0, 0.5, -18)
+textBox.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+textBox.PlaceholderText = "Username"
+textBox.TextColor3 = Color3.fromRGB(255, 255, 255)
 textBox.Text = ""
+textBox.TextSize = 18
+textBox.Font = Enum.Font.Gotham
 textBox.ClearTextOnFocus = false
-textBox.TextSize = 20
-textBox.AnchorPoint = Vector2.new(0, 0)
 textBox.Parent = frame
 
-local textBoxCorner = Instance.new("UICorner")
-textBoxCorner.CornerRadius = UDim.new(0, 12)
-textBoxCorner.Parent = textBox
+local boxCorner = Instance.new("UICorner")
+boxCorner.CornerRadius = UDim.new(0, 8)
+boxCorner.Parent = textBox
 
-local submitBtn = Instance.new("TextButton")
-submitBtn.Size = UDim2.new(0, 120, 0, 35)
-submitBtn.Position = UDim2.new(0.5, -60, 1, -45)
-submitBtn.BackgroundColor3 = Color3.fromRGB(70, 130, 180)
-submitBtn.Text = "Confirm"
-submitBtn.Font = Enum.Font.GothamBold
-submitBtn.TextSize = 20
-submitBtn.TextColor3 = Color3.fromRGB(240, 240, 240)
-submitBtn.AutoButtonColor = true
-submitBtn.AnchorPoint = Vector2.new(0.5, 0)
-submitBtn.Parent = frame
+local confirmBtn = Instance.new("TextButton")
+confirmBtn.Size = UDim2.new(0.275, 0, 0, 36)
+confirmBtn.Position = UDim2.new(0.7, 0, 0.5, -18)
+confirmBtn.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
+confirmBtn.Text = "Confirm"
+confirmBtn.TextSize = 18
+confirmBtn.Font = Enum.Font.GothamBold
+confirmBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+confirmBtn.AutoButtonColor = true
+confirmBtn.Parent = frame
 
 local btnCorner = Instance.new("UICorner")
-btnCorner.CornerRadius = UDim.new(0, 14)
-btnCorner.Parent = submitBtn
-
-local fadeIn = TweenService:Create(frame, TweenInfo.new(0.5, Enum.EasingStyle.Quad), {BackgroundTransparency = 0})
-fadeIn:Play()
+btnCorner.CornerRadius = UDim.new(0, 8)
+btnCorner.Parent = confirmBtn
 
 local dragging, dragInput, dragStart, startPos
-
-local function update(input)
-	local delta = input.Position - dragStart
-	frame.Position = UDim2.new(
-		math.clamp(startPos.X.Scale, 0, 1),
-		math.clamp(startPos.X.Offset + delta.X, 0, workspace.CurrentCamera.ViewportSize.X - frame.AbsoluteSize.X),
-		math.clamp(startPos.Y.Scale, 0, 1),
-		math.clamp(startPos.Y.Offset + delta.Y, 0, workspace.CurrentCamera.ViewportSize.Y - frame.AbsoluteSize.Y)
-	)
-end
-
 frame.InputBegan:Connect(function(input)
 	if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
 		dragging = true
@@ -117,77 +76,55 @@ frame.InputBegan:Connect(function(input)
 		end)
 	end
 end)
-
-frame.InputChanged:Connect(function(input)
+UserInputService.InputChanged:Connect(function(input)
 	if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
 		dragInput = input
 	end
 end)
-
 UserInputService.InputChanged:Connect(function(input)
-	if input == dragInput and dragging then
-		update(input)
+	if dragging and input == dragInput then
+		local delta = input.Position - dragStart
+		frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
 	end
 end)
 
 local function morphToUsername(username)
-	if username == "" then return end
-
-	local function getUserId(name)
-		local success, result = pcall(function()
-			return Players:GetUserIdFromNameAsync(name)
-		end)
-		if success then return result end
-		return nil
-	end
-
-	local userId = getUserId(username)
-	if not userId then return end
-
-	local clonedChar = nil
-	local success, err = pcall(function()
-		clonedChar = Players:CreateHumanoidModelFromUserId(userId)
+	local success, userId = pcall(function()
+		return Players:GetUserIdFromNameAsync(username)
 	end)
-	if not success or not clonedChar then return end
+	if not success then return end
 
-	clonedChar.Name = lp.Name
-	local root = clonedChar:FindFirstChild("HumanoidRootPart") or clonedChar.PrimaryPart
-	if root then
-		local currentChar = lp.Character
-		if currentChar and currentChar:FindFirstChild("HumanoidRootPart") then
-			clonedChar:PivotTo(currentChar.HumanoidRootPart.CFrame)
-		end
+	local clone = Players:CreateHumanoidModelFromUserId(userId)
+	if not clone then return end
+
+	clone.Name = lp.Name
+	local root = clone:FindFirstChild("HumanoidRootPart") or clone.PrimaryPart
+	local curRoot = lp.Character and lp.Character:FindFirstChild("HumanoidRootPart")
+
+	if curRoot and root then
+		clone:PivotTo(curRoot.CFrame)
 	end
 
-	if lp.Character then lp.Character:Destroy() end
+	if lp.Character then
+		lp.Character:Destroy()
+	end
 
-	clonedChar.Parent = workspace
-	lp.Character = clonedChar
+	clone.Parent = workspace
+	lp.Character = clone
 
 	task.wait(0.1)
 	local cam = workspace.CurrentCamera
-	local humanoid = clonedChar:FindFirstChildOfClass("Humanoid")
-	if humanoid then
-		cam.CameraSubject = humanoid
+	local hum = clone:FindFirstChildOfClass("Humanoid")
+	if hum then
+		cam.CameraSubject = hum
 		cam.CameraType = Enum.CameraType.Custom
 	end
 end
 
-local function closeGui()
-	local fadeOut = TweenService:Create(frame, TweenInfo.new(0.5, Enum.EasingStyle.Quad), {BackgroundTransparency = 1})
-	fadeOut:Play()
-	fadeOut.Completed:Wait()
-	screenGui:Destroy()
-end
-
-submitBtn.MouseButton1Click:Connect(function()
-	local username = textBox.Text:match("%S+")
-	if username and username ~= "" then
-		morphToUsername(username)
-		closeGui()
+confirmBtn.MouseButton1Click:Connect(function()
+	local user = textBox.Text:match("^%s*(.-)%s*$")
+	if user ~= "" then
+		morphToUsername(user)
+		screenGui:Destroy()
 	end
-end)
-
-textBox.FocusLost:Connect(function(enterPressed)
-	if enterPressed then submitBtn.MouseButton1Click:Fire() end
 end)
