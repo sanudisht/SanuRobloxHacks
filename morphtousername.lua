@@ -9,11 +9,39 @@ screenGui.ResetOnSpawn = false
 screenGui.IgnoreGuiInset = true
 screenGui.Parent = lp:WaitForChild("PlayerGui")
 
+local splashFrame = Instance.new("Frame")
+splashFrame.Size = UDim2.new(0.4, 0, 0.1, 0)
+splashFrame.Position = UDim2.new(0.3, 0, 0.45, 0)
+splashFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+splashFrame.BackgroundTransparency = 1
+splashFrame.Parent = screenGui
+
+local splashCorner = Instance.new("UICorner")
+splashCorner.CornerRadius = UDim.new(0, 10)
+splashCorner.Parent = splashFrame
+
+local splashText = Instance.new("TextLabel")
+splashText.Size = UDim2.new(1, 0, 1, 0)
+splashText.Position = UDim2.new(0, 0, 0, 0)
+splashText.BackgroundTransparency = 1
+splashText.Text = "Morph GUI Beta V1"
+splashText.TextColor3 = Color3.fromRGB(255, 255, 255)
+splashText.Font = Enum.Font.GothamBold
+splashText.TextScaled = true
+splashText.Parent = splashFrame
+
+TweenService:Create(splashFrame, TweenInfo.new(0.5), {BackgroundTransparency = 0}):Play()
+task.wait(2)
+TweenService:Create(splashFrame, TweenInfo.new(0.5), {BackgroundTransparency = 1}):Play()
+TweenService:Create(splashText, TweenInfo.new(0.5), {TextTransparency = 1}):Play()
+task.wait(0.6)
+splashFrame:Destroy()
+
 local frame = Instance.new("Frame")
 frame.Size = UDim2.new(0.6, 0, 0, 100)
 frame.Position = UDim2.new(0.2, 0, 0.4, 0)
 frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-frame.BackgroundTransparency = 0
+frame.BackgroundTransparency = 1
 frame.BorderSizePixel = 0
 frame.Parent = screenGui
 frame.ClipsDescendants = true
@@ -21,6 +49,8 @@ frame.ClipsDescendants = true
 local uicorner = Instance.new("UICorner")
 uicorner.CornerRadius = UDim.new(0, 12)
 uicorner.Parent = frame
+
+TweenService:Create(frame, TweenInfo.new(0.5), {BackgroundTransparency = 0}):Play()
 
 local title = Instance.new("TextLabel")
 title.Size = UDim2.new(1, 0, 0, 28)
@@ -88,50 +118,6 @@ UserInputService.InputChanged:Connect(function(input)
 	end
 end)
 
-local function injectAnimations(character)
-	local animate = Instance.new("LocalScript")
-	animate.Name = "Animate"
-	animate.Source = [[
-		local char = script.Parent
-		local hum = char:WaitForChild("Humanoid")
-		local animator = hum:FindFirstChildOfClass("Animator") or Instance.new("Animator", hum)
-		local animations = {
-			Idle = "rbxassetid://507766388",
-			Walk = "rbxassetid://507777826",
-			Run = "rbxassetid://507767714",
-			Jump = "rbxassetid://507765000",
-			Fall = "rbxassetid://507767968"
-		}
-		local anims = {}
-		for name, id in pairs(animations) do
-			local anim = Instance.new("Animation")
-			anim.AnimationId = id
-			anims[name] = animator:LoadAnimation(anim)
-		end
-		local stateConn
-		stateConn = hum.StateChanged:Connect(function(_, newState)
-			for _, a in pairs(anims) do a:Stop() end
-			if newState == Enum.HumanoidStateType.Running then
-				anims.Walk:Play()
-			elseif newState == Enum.HumanoidStateType.Freefall then
-				anims.Fall:Play()
-			elseif newState == Enum.HumanoidStateType.Jumping then
-				anims.Jump:Play()
-			else
-				anims.Idle:Play()
-			end
-		end)
-		hum.Running:Connect(function(speed)
-			if speed > 1 then
-				anims.Walk:Play()
-			else
-				anims.Idle:Play()
-			end
-		end)
-	]]
-	animate.Parent = character
-end
-
 local function morphToUsername(username)
 	local success, userId = pcall(function()
 		return Players:GetUserIdFromNameAsync(username)
@@ -155,8 +141,6 @@ local function morphToUsername(username)
 
 	clone.Parent = workspace
 	lp.Character = clone
-
-	injectAnimations(clone)
 
 	task.wait(0.1)
 	local cam = workspace.CurrentCamera
