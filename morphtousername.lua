@@ -88,6 +88,50 @@ UserInputService.InputChanged:Connect(function(input)
 	end
 end)
 
+local function injectAnimations(character)
+	local animate = Instance.new("LocalScript")
+	animate.Name = "Animate"
+	animate.Source = [[
+		local char = script.Parent
+		local hum = char:WaitForChild("Humanoid")
+		local animator = hum:FindFirstChildOfClass("Animator") or Instance.new("Animator", hum)
+		local animations = {
+			Idle = "rbxassetid://507766388",
+			Walk = "rbxassetid://507777826",
+			Run = "rbxassetid://507767714",
+			Jump = "rbxassetid://507765000",
+			Fall = "rbxassetid://507767968"
+		}
+		local anims = {}
+		for name, id in pairs(animations) do
+			local anim = Instance.new("Animation")
+			anim.AnimationId = id
+			anims[name] = animator:LoadAnimation(anim)
+		end
+		local stateConn
+		stateConn = hum.StateChanged:Connect(function(_, newState)
+			for _, a in pairs(anims) do a:Stop() end
+			if newState == Enum.HumanoidStateType.Running then
+				anims.Walk:Play()
+			elseif newState == Enum.HumanoidStateType.Freefall then
+				anims.Fall:Play()
+			elseif newState == Enum.HumanoidStateType.Jumping then
+				anims.Jump:Play()
+			else
+				anims.Idle:Play()
+			end
+		end)
+		hum.Running:Connect(function(speed)
+			if speed > 1 then
+				anims.Walk:Play()
+			else
+				anims.Idle:Play()
+			end
+		end)
+	]]
+	animate.Parent = character
+end
+
 local function morphToUsername(username)
 	local success, userId = pcall(function()
 		return Players:GetUserIdFromNameAsync(username)
@@ -111,6 +155,8 @@ local function morphToUsername(username)
 
 	clone.Parent = workspace
 	lp.Character = clone
+
+	injectAnimations(clone)
 
 	task.wait(0.1)
 	local cam = workspace.CurrentCamera
