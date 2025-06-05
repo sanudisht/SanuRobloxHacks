@@ -1,6 +1,7 @@
 local player = game.Players.LocalPlayer
 local character = player.Character or player.CharacterAdded:Wait()
 local humanoid = character:WaitForChild("Humanoid")
+
 local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "UltimateAdminGUI"
 screenGui.ResetOnSpawn = false
@@ -11,50 +12,47 @@ screenGui.Parent = player:WaitForChild("PlayerGui")
 -------------------
 local mainFrame = Instance.new("Frame")
 mainFrame.Name = "MainFrame"
-mainFrame.Size = UDim2.new(0, 200, 0, 300)
-mainFrame.Position = UDim2.new(0, 20, 0.5, -150)
+mainFrame.Size = UDim2.new(0, 180, 0, 220)
+mainFrame.Position = UDim2.new(0, 10, 0.5, -110)
 mainFrame.BackgroundColor3 = Color3.fromRGB(90, 90, 90)
 mainFrame.BorderSizePixel = 0
 mainFrame.Visible = true
+mainFrame.Active = true
+mainFrame.Draggable = true
 mainFrame.Parent = screenGui
 
-local uiCorner = Instance.new("UICorner")
-uiCorner.CornerRadius = UDim.new(0, 15)
-uiCorner.Parent = mainFrame
+Instance.new("UICorner", mainFrame).CornerRadius = UDim.new(0, 15)
 
 -- Title
 local title = Instance.new("TextLabel")
 title.Size = UDim2.new(1, 0, 0, 40)
-title.Text = "Ultimate Admin GUI\n(v1)"
+title.Text = "Ultimate Admin GUI (v1)"
 title.Font = Enum.Font.FredokaOne
 title.TextColor3 = Color3.fromRGB(255, 255, 255)
 title.TextScaled = true
 title.BackgroundTransparency = 1
-title.TextYAlignment = Enum.TextYAlignment.Top
 title.Parent = mainFrame
 
 -- Button Factory
 local function createButton(name, text, order)
 	local btn = Instance.new("TextButton")
 	btn.Name = name
-	btn.Size = UDim2.new(0.9, 0, 0, 50)
-	btn.Position = UDim2.new(0.05, 0, 0, 50 + (order - 1) * 60)
+	btn.Size = UDim2.new(0.9, 0, 0, 35)
+	btn.Position = UDim2.new(0.05, 0, 0, 45 + (order - 1) * 40)
 	btn.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
 	btn.Font = Enum.Font.FredokaOne
 	btn.TextColor3 = Color3.fromRGB(255, 255, 255)
 	btn.TextScaled = true
 	btn.Text = text
 	btn.Parent = mainFrame
-	local corner = Instance.new("UICorner")
-	corner.CornerRadius = UDim.new(0, 10)
-	corner.Parent = btn
+	Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 10)
 	return btn
 end
 
 -- Buttons
 local flyButton = createButton("FlyButton", "Fly", 1)
 local speedButton = createButton("SpeedButton", "Speed", 2)
-local toolsButton = createButton("ToolsButton", "Building Tools", 3)
+local toolsButton = createButton("ToolsButton", "Tools", 3)
 local minimizeButton = createButton("MinimizeButton", "Minimize", 4)
 
 -------------------------
@@ -62,22 +60,22 @@ local minimizeButton = createButton("MinimizeButton", "Minimize", 4)
 -------------------------
 local miniFrame = Instance.new("Frame")
 miniFrame.Name = "MiniFrame"
-miniFrame.Size = UDim2.new(0, 300, 0, 80)
-miniFrame.Position = UDim2.new(0, 20, 1, -100)
+miniFrame.Size = UDim2.new(0, 250, 0, 60)
+miniFrame.Position = UDim2.new(0, 10, 1, -70)
 miniFrame.BackgroundColor3 = Color3.fromRGB(90, 90, 90)
 miniFrame.BorderSizePixel = 0
 miniFrame.Visible = false
+miniFrame.Active = true
+miniFrame.Draggable = true
 miniFrame.Parent = screenGui
 
-local miniCorner = Instance.new("UICorner")
-miniCorner.CornerRadius = UDim.new(0, 20)
-miniCorner.Parent = miniFrame
+Instance.new("UICorner", miniFrame).CornerRadius = UDim.new(0, 20)
 
 -- Minimized Label
 local miniLabel = Instance.new("TextLabel")
-miniLabel.Size = UDim2.new(0.65, 0, 1, 0)
+miniLabel.Size = UDim2.new(0.6, 0, 1, 0)
 miniLabel.Position = UDim2.new(0, 0, 0, 0)
-miniLabel.Text = "Ultimate Admin\nGUI (v1)"
+miniLabel.Text = "Ultimate Admin GUI (v1)"
 miniLabel.Font = Enum.Font.FredokaOne
 miniLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 miniLabel.TextScaled = true
@@ -86,8 +84,8 @@ miniLabel.Parent = miniFrame
 
 -- Open Button
 local openButton = Instance.new("TextButton")
-openButton.Size = UDim2.new(0.175, 0, 0.5, 0)
-openButton.Position = UDim2.new(0.675, 0, 0, 0)
+openButton.Size = UDim2.new(0.2, 0, 0.5, 0)
+openButton.Position = UDim2.new(0.65, 0, 0, 0)
 openButton.Text = "Open"
 openButton.Font = Enum.Font.FredokaOne
 openButton.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -98,8 +96,8 @@ Instance.new("UICorner", openButton).CornerRadius = UDim.new(0, 10)
 
 -- Close Button
 local closeButton = Instance.new("TextButton")
-closeButton.Size = UDim2.new(0.175, 0, 0.5, 0)
-closeButton.Position = UDim2.new(0.675, 0, 0.5, 0)
+closeButton.Size = UDim2.new(0.2, 0, 0.5, 0)
+closeButton.Position = UDim2.new(0.65, 0, 0.5, 0)
 closeButton.Text = "Close"
 closeButton.Font = Enum.Font.FredokaOne
 closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
