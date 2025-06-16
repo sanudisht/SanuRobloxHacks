@@ -1,0 +1,67 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
+
+local player = Players.LocalPlayer
+local messageEvent = ReplicatedStorage:WaitForChild("MessageEvent")
+local sendMessageEvent = ReplicatedStorage:WaitForChild("SendMessageEvent")
+
+local gui = script.Parent
+local frame = gui:WaitForChild("Frame")
+local messageLabel = frame:WaitForChild("MessageLabel")
+
+local allowedUsernames = {
+    "MightyChaseBG"
+}
+
+local function isAllowed(username)
+    for _, name in ipairs(allowedUsernames) do
+        if name == username then
+            return true
+        end
+    end
+    return false
+end
+
+messageEvent.OnClientEvent:Connect(function(message)
+    messageLabel.Text = message
+end)
+
+if isAllowed(player.Name) then
+    local senderFrame = Instance.new("Frame")
+    senderFrame.Name = "SenderFrame"
+    senderFrame.Size = UDim2.new(1, 0, 0, 60)
+    senderFrame.Position = UDim2.new(0, 0, 1, 0)
+    senderFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+    senderFrame.BorderSizePixel = 0
+    senderFrame.Parent = gui
+
+    local inputBox = Instance.new("TextBox")
+    inputBox.Name = "InputBox"
+    inputBox.Size = UDim2.new(0.7, -10, 0.6, 0)
+    inputBox.Position = UDim2.new(0, 10, 0, 8)
+    inputBox.PlaceholderText = "Enter a message"
+    inputBox.Text = ""
+    inputBox.TextColor3 = Color3.new(1, 1, 1)
+    inputBox.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+    inputBox.BorderSizePixel = 0
+    inputBox.ClearTextOnFocus = false
+    inputBox.Parent = senderFrame
+
+    local sendButton = Instance.new("TextButton")
+    sendButton.Name = "SendButton"
+    sendButton.Size = UDim2.new(0.3, -10, 0.6, 0)
+    sendButton.Position = UDim2.new(0.7, 5, 0, 8)
+    sendButton.Text = "Send"
+    sendButton.TextColor3 = Color3.new(1, 1, 1)
+    sendButton.BackgroundColor3 = Color3.fromRGB(30, 150, 90)
+    sendButton.BorderSizePixel = 0
+    sendButton.Parent = senderFrame
+
+    sendButton.MouseButton1Click:Connect(function()
+        local msg = inputBox.Text
+        if msg ~= "" then
+            sendMessageEvent:FireServer(msg)
+            inputBox.Text = ""
+        end
+    end)
+end
