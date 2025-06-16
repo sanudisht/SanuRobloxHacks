@@ -2,9 +2,6 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 
 local player = Players.LocalPlayer
-local messageEvent = ReplicatedStorage:WaitForChild("MessageEvent")
-local sendMessageEvent = ReplicatedStorage:WaitForChild("SendMessageEvent")
-
 local gui = script.Parent
 local frame = gui:WaitForChild("Frame")
 local messageLabel = frame:WaitForChild("MessageLabel")
@@ -22,9 +19,12 @@ local function isAllowed(username)
     return false
 end
 
-messageEvent.OnClientEvent:Connect(function(message)
-    messageLabel.Text = message
-end)
+local messageEvent = ReplicatedStorage:FindFirstChild("MessageEvent")
+if messageEvent then
+    messageEvent.OnClientEvent:Connect(function(message)
+        messageLabel.Text = message
+    end)
+end
 
 if isAllowed(player.Name) then
     local senderFrame = Instance.new("Frame")
@@ -57,11 +57,16 @@ if isAllowed(player.Name) then
     sendButton.BorderSizePixel = 0
     sendButton.Parent = senderFrame
 
-    sendButton.MouseButton1Click:Connect(function()
-        local msg = inputBox.Text
-        if msg ~= "" then
-            sendMessageEvent:FireServer(msg)
-            inputBox.Text = ""
-        end
-    end)
+    local sendMessageEvent = ReplicatedStorage:FindFirstChild("SendMessageEvent")
+    if sendMessageEvent then
+        sendButton.MouseButton1Click:Connect(function()
+            local msg = inputBox.Text
+            if msg ~= "" then
+                sendMessageEvent:FireServer(msg)
+                inputBox.Text = ""
+            end
+        end)
+    else
+        warn("SendMessageEvent not found in ReplicatedStorage.")
+    end
 end
